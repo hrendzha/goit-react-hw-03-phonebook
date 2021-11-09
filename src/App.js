@@ -4,12 +4,25 @@ import ContactForm from './components/ContactForm';
 import Filter from './components/Filter';
 import ContactList from './components/ContactList';
 import Container from './components/Container';
+import * as storage from './js/localStorage';
 
 class App extends Component {
     state = {
         contacts: [],
         filter: '',
     };
+
+    componentDidMount() {
+        const contacts = storage.load(storage.LS_KEYS.contacts);
+        contacts && this.setState({ contacts });
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        const { contacts } = this.state;
+        if (prevState.contacts !== contacts) {
+            storage.save(storage.LS_KEYS.contacts, contacts);
+        }
+    }
 
     handleFormSubmit = userInfo =>
         this.setState(({ contacts }) => ({
@@ -36,11 +49,6 @@ class App extends Component {
         this.setState(({ contacts }) => ({
             contacts: contacts.filter(({ id }) => id !== contactId),
         }));
-
-    shouldComponentUpdate(nextProps, nextState) {
-        console.log(nextState);
-        return false;
-    }
 
     render() {
         const { contacts, filter } = this.state;
